@@ -19,6 +19,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dmatn
+double dmatn(arma::mat X, arma::mat M, arma::mat Q, arma::mat P, bool logd);
+RcppExport SEXP _fdr_dmatn(SEXP XSEXP, SEXP MSEXP, SEXP QSEXP, SEXP PSEXP, SEXP logdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Q(QSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type P(PSEXP);
+    Rcpp::traits::input_parameter< bool >::type logd(logdSEXP);
+    rcpp_result_gen = Rcpp::wrap(dmatn(X, M, Q, P, logd));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rinvwish
 arma::mat rinvwish(int v, arma::mat S);
 RcppExport SEXP _fdr_rinvwish(SEXP vSEXP, SEXP SSEXP) {
@@ -28,6 +43,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type v(vSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type S(SSEXP);
     rcpp_result_gen = Rcpp::wrap(rinvwish(v, S));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dinvwish
+double dinvwish(arma::mat Sigma, int v, arma::mat S, bool logd);
+RcppExport SEXP _fdr_dinvwish(SEXP SigmaSEXP, SEXP vSEXP, SEXP SSEXP, SEXP logdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< int >::type v(vSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type S(SSEXP);
+    Rcpp::traits::input_parameter< bool >::type logd(logdSEXP);
+    rcpp_result_gen = Rcpp::wrap(dinvwish(Sigma, v, S, logd));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -57,59 +86,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dmatn
-double dmatn(arma::mat X, arma::mat M, arma::mat Q, arma::mat P, bool logd);
-RcppExport SEXP _fdr_dmatn(SEXP XSEXP, SEXP MSEXP, SEXP QSEXP, SEXP PSEXP, SEXP logdSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type M(MSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type Q(QSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type P(PSEXP);
-    Rcpp::traits::input_parameter< bool >::type logd(logdSEXP);
-    rcpp_result_gen = Rcpp::wrap(dmatn(X, M, Q, P, logd));
-    return rcpp_result_gen;
-END_RCPP
-}
-// dmatn2
-double dmatn2(arma::mat X, arma::mat M, arma::mat Q, arma::mat P, bool logd);
-RcppExport SEXP _fdr_dmatn2(SEXP XSEXP, SEXP MSEXP, SEXP QSEXP, SEXP PSEXP, SEXP logdSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type M(MSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type Q(QSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type P(PSEXP);
-    Rcpp::traits::input_parameter< bool >::type logd(logdSEXP);
-    rcpp_result_gen = Rcpp::wrap(dmatn2(X, M, Q, P, logd));
-    return rcpp_result_gen;
-END_RCPP
-}
-// dinvwish
-double dinvwish(arma::mat Sigma, int v, arma::mat S, bool logd);
-RcppExport SEXP _fdr_dinvwish(SEXP SigmaSEXP, SEXP vSEXP, SEXP SSEXP, SEXP logdSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
-    Rcpp::traits::input_parameter< int >::type v(vSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type S(SSEXP);
-    Rcpp::traits::input_parameter< bool >::type logd(logdSEXP);
-    rcpp_result_gen = Rcpp::wrap(dinvwish(Sigma, v, S, logd));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_fdr_rmatn", (DL_FUNC) &_fdr_rmatn, 3},
+    {"_fdr_dmatn", (DL_FUNC) &_fdr_dmatn, 5},
     {"_fdr_rinvwish", (DL_FUNC) &_fdr_rinvwish, 2},
+    {"_fdr_dinvwish", (DL_FUNC) &_fdr_dinvwish, 4},
     {"_fdr_rmultn", (DL_FUNC) &_fdr_rmultn, 2},
     {"_fdr_dmultn", (DL_FUNC) &_fdr_dmultn, 4},
-    {"_fdr_dmatn", (DL_FUNC) &_fdr_dmatn, 5},
-    {"_fdr_dmatn2", (DL_FUNC) &_fdr_dmatn2, 5},
-    {"_fdr_dinvwish", (DL_FUNC) &_fdr_dinvwish, 4},
     {NULL, NULL, 0}
 };
 

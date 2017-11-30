@@ -2,13 +2,22 @@
 
 #include <RcppArmadillo.h>
 
-//' @rdname dnorminvwish
-//' @keywords internal
+//' Generate from and evaluate the density of the matrix normal distribution
+//' @param M \code{p * q} mean matrix
+//' @param Q \code{q * q} covariance matrix
+//' @param P \code{p * p} covariance matrix
+//' @return For \code{rmatn} a matrix \code{X}, for \code{dmatn} the (logarithm of) the density evaluation.
+//' @examples
+//' set.seed(100)
+//' p <- 20
+//' q <- 5
+//' M <- matrix(rnorm(p*q), p, q)
+//' P <- crossprod(matrix(rnorm(p*p), p, p))
+//' Q <- crossprod(matrix(rnorm(q*q), q, q))
+//' X <- rmatn(M, Q, P)
+//' dmatn(X, M, Q, P, logd = TRUE)
 // [[Rcpp::export]]
 arma::mat rmatn(arma::mat M, arma::mat Q, arma::mat P){
-/*-------------------------------------------------------
-# Generate draws from a matricvariate normal distribution
-#-------------------------------------------------------*/
   int p = P.n_rows;
   int q = Q.n_rows;
   arma::mat L = arma::chol(Q, "upper");
@@ -18,9 +27,41 @@ arma::mat rmatn(arma::mat M, arma::mat Q, arma::mat P){
   return(X);
 }
 
+//' @rdname rmatn
+//' @param X \code{p * q} matrix at which to evaluate the density
+//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+// [[Rcpp::export]]
+double dmatn(arma::mat X, arma::mat M, arma::mat Q, arma::mat P,
+             bool logd = false){
+  int n = X.n_rows;
+  int k = X.n_cols;
+  arma::mat Q_C = arma::chol(Q);
+  arma::mat Q_C_inv = arma::inv(arma::trimatu(Q_C));
+  arma::mat P_C = arma::chol(P);
+  arma::mat P_C_inv = arma::inv(arma::trimatu(P_C));
+  arma::mat ss = X - M;
+  double Q_logdet = sum(log(arma::diagvec(Q_C)));
+  double P_logdet = sum(log(arma::diagvec(P_C)));
+  double exponent = -0.5 * arma::trace(Q_C_inv * Q_C_inv.t() * ss.t() * P_C_inv * P_C_inv.t() * ss);
+  double con = -((log(2 * M_PI)/2) * n * k + (Q_logdet) * n + (P_logdet) * k);
+  double out = exponent + con;
+  if (logd == false) {
+    out = exp(out);
+  }
+  return(out);
+}
 
-//' @rdname dnorminvwish
-//' @keywords internal
+
+//' Generate from and evaluate the density of the inverse Wishart distribution
+//' @param v degrees of freedom (integer)
+//' @param S \code{q * q} scale matrix
+//' @return For \code{rinvwish} a matrix \code{Sigma}, for \code{dinvwish} the (logarithm of) the density evaluation.
+//' set.seed(100)
+//' q <- 5
+//' v <- 10
+//' S <- crossprod(matrix(rnorm(q*q), q, q))
+//' Sigma <- rinvwish(v, S)
+//' dinvwish(Sigma, v, S, logd = TRUE)
 // [[Rcpp::export]]
 arma::mat rinvwish(int v, arma::mat S){
   int p = S.n_rows;
@@ -41,97 +82,9 @@ arma::mat rinvwish(int v, arma::mat S){
   return(X);
 }
 
-
-//' @rdname dmultn
-//' @keywords internal
-// [[Rcpp::export]]
-arma::vec rmultn(arma::vec m, arma::mat Sigma){
-  /*-------------------------------------------------------
-# Generate draws from a matricvariate normal distribution
-#-------------------------------------------------------*/
-  int p = Sigma.n_rows;
-  arma::vec X = Rcpp::rnorm(p);
-  arma::mat L = arma::chol(Sigma, "lower");
-  X = m + L * X;
-  return(X);
-}
-
-const double log2pi = std::log(2.0 * M_PI);
-
-// [[Rcpp::depends("RcppArmadillo")]]
-// [[Rcpp::export]]
-arma::vec dmultn(arma::mat x,
-                      arma::rowvec m,
-                      arma::mat Sigma,
-                      bool logd = false) {
-  int n = x.n_rows;
-  int xdim = x.n_cols;
-  arma::vec out(n);
-  arma::mat rooti = arma::trans(arma::inv(trimatu(arma::chol(Sigma))));
-  double rootisum = arma::sum(log(rooti.diag()));
-  double constants = -(static_cast<double>(xdim)/2.0) * log2pi;
-
-  for (int i=0; i < n; i++) {
-    arma::vec z = rooti * arma::trans( x.row(i) - m) ;
-    out(i)      = constants - 0.5 * arma::sum(z%z) + rootisum;
-  }
-
-  if (logd == false) {
-    out = exp(out);
-  }
-  return(out);
-}
-
-// [[Rcpp::export]]
-double dmatn2(arma::mat X, arma::mat M, arma::mat Q, arma::mat P,
-             bool logd = false){
-  /*-------------------------------------------------------
-# Generate draws from a matricvariate normal distribution
-#-------------------------------------------------------*/
-  int n = X.n_rows;
-  int k = X.n_cols;
-  double Q_logdet;
-  double P_logdet;
-  double Q_sign;
-  double P_sign;
-  arma::log_det(Q_logdet, Q_sign, Q);
-  arma::log_det(P_logdet, P_sign, P);
-  arma::mat ss = X - M;
-  double exponent = -0.5 * arma::trace(arma::inv_sympd(Q) * ss.t() * arma::inv_sympd(P) * ss);
-  double con = -((log(2 * M_PI)/2) * n * k + (Q_logdet/2) * n + (P_logdet/2) * k);
-  double out = exponent + con;
-  if (logd == false) {
-    out = exp(out);
-  }
-  return(out);
-}
-
-// [[Rcpp::export]]
-double dmatn(arma::mat X, arma::mat M, arma::mat Q, arma::mat P,
-             bool logd = false){
-  /*-------------------------------------------------------
-# Generate draws from a matricvariate normal distribution
-#-------------------------------------------------------*/
-  int n = X.n_rows;
-  int k = X.n_cols;
-  arma::mat Q_C = arma::chol(Q);
-  arma::mat Q_C_inv = arma::inv(arma::trimatu(Q_C));
-  arma::mat P_C = arma::chol(P);
-  arma::mat P_C_inv = arma::inv(arma::trimatu(P_C));
-  arma::mat ss = X - M;
-  double Q_logdet = sum(log(arma::diagvec(Q_C)));
-  double P_logdet = sum(log(arma::diagvec(P_C)));
-  double exponent = -0.5 * arma::trace(Q_C_inv * Q_C_inv.t() * ss.t() * P_C_inv * P_C_inv.t() * ss);
-  double con = -((log(2 * M_PI)/2) * n * k + (Q_logdet) * n + (P_logdet) * k);
-  double out = exponent + con;
-  if (logd == false) {
-    out = exp(out);
-  }
-  return(out);
-}
-
-//' @rdname dnorminvwish
-//' @keywords internal
+//' @rdname rinvwish
+//' @param Sigma \code{q * q} matrix at which to evaluate the density
+//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
 // [[Rcpp::export]]
 double dinvwish(arma::mat Sigma, int v, arma::mat S, bool logd = false){
   int q = Sigma.n_cols;
@@ -155,3 +108,79 @@ double dinvwish(arma::mat Sigma, int v, arma::mat S, bool logd = false){
   }
   return(out);
 }
+
+//' Generate from and evaluate the density of the multivariate normal distribution
+//' @param m mean vector (length \code{p})
+//' @param Sigma \code{p * p} covariance matrix
+//' @return For \code{rmultn} a vector \code{x}, for \code{dmultn} the (logarithm of) the density evaluation.
+//' set.seed(100)
+//' p <- 20
+//' m <- rnorm(p)
+//' Sigma <- crossprod(matrix(rnorm(p*p), p, p))
+//' x <- rmultn(m, Sigma)
+//' dmultn(x, m, Sigma, logd = TRUE)
+// [[Rcpp::export]]
+arma::vec rmultn(arma::vec m, arma::mat Sigma){
+  /*-------------------------------------------------------
+# Generate draws from a matricvariate normal distribution
+#-------------------------------------------------------*/
+  int p = Sigma.n_rows;
+  arma::vec X = Rcpp::rnorm(p);
+  arma::mat L = arma::chol(Sigma, "lower");
+  X = m + L * X;
+  return(X);
+}
+
+const double log2pi = std::log(2.0 * M_PI);
+
+//' @rdname rmultn
+//' @param x \code{n * p} matrix at which to evaluate the density
+//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+// [[Rcpp::export]]
+arma::vec dmultn(arma::mat x,
+                      arma::rowvec m,
+                      arma::mat Sigma,
+                      bool logd = false) {
+  int n = x.n_rows;
+  int xdim = x.n_cols;
+  arma::vec out(n);
+  arma::mat rooti = arma::trans(arma::inv(trimatu(arma::chol(Sigma))));
+  double rootisum = arma::sum(log(rooti.diag()));
+  double constants = -(static_cast<double>(xdim)/2.0) * log2pi;
+
+  for (int i=0; i < n; i++) {
+    arma::vec z = rooti * arma::trans( x.row(i) - m) ;
+    out(i)      = constants - 0.5 * arma::sum(z%z) + rootisum;
+  }
+
+  if (logd == false) {
+    out = exp(out);
+  }
+  return(out);
+}
+
+
+
+double dmatn2(arma::mat X, arma::mat M, arma::mat Q, arma::mat P,
+              bool logd = false){
+  /*-------------------------------------------------------
+# Generate draws from a matricvariate normal distribution
+#-------------------------------------------------------*/
+  int n = X.n_rows;
+  int k = X.n_cols;
+  double Q_logdet;
+  double P_logdet;
+  double Q_sign;
+  double P_sign;
+  arma::log_det(Q_logdet, Q_sign, Q);
+  arma::log_det(P_logdet, P_sign, P);
+  arma::mat ss = X - M;
+  double exponent = -0.5 * arma::trace(arma::inv_sympd(Q) * ss.t() * arma::inv_sympd(P) * ss);
+  double con = -((log(2 * M_PI)/2) * n * k + (Q_logdet/2) * n + (P_logdet/2) * k);
+  double out = exponent + con;
+  if (logd == false) {
+    out = exp(out);
+  }
+  return(out);
+}
+
