@@ -2,9 +2,12 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' Generate from and evaluate the density of the matrix normal distribution
+#' @param X \code{p * q} matrix at which to evaluate the density
 #' @param M \code{p * q} mean matrix
 #' @param Q \code{q * q} covariance matrix
 #' @param P \code{p * p} covariance matrix
+#' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+#' @name matn
 #' @return For \code{rmatn} a matrix \code{X}, for \code{dmatn} the (logarithm of) the density evaluation.
 #' @examples
 #' set.seed(100)
@@ -15,20 +18,18 @@
 #' Q <- crossprod(matrix(rnorm(q*q), q, q))
 #' X <- rmatn(M, Q, P)
 #' dmatn(X, M, Q, P, logd = TRUE)
-rmatn <- function(M, Q, P) {
-    .Call(`_fdr_rmatn`, M, Q, P)
-}
-
-#' @rdname rmatn
-#' @param X \code{p * q} matrix at which to evaluate the density
-#' @param logd logical; if \code{TRUE} the logarithm of the density is returned
-dmatn <- function(X, M, Q, P, logd = FALSE) {
-    .Call(`_fdr_dmatn`, X, M, Q, P, logd)
-}
+#' @references Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.
+#' In G. Elliott & T. Timmermann (Eds.), Handbook of economic forecasting,
+#' volume 2B. North Holland, Elsevier.
+#'
+NULL
 
 #' Generate from and evaluate the density of the inverse Wishart distribution
+#' @param Sigma \code{q * q} matrix at which to evaluate the density
 #' @param v degrees of freedom (integer)
 #' @param S \code{q * q} scale matrix
+#' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+#' @name invwish
 #' @return For \code{rinvwish} a matrix \code{Sigma}, for \code{dinvwish} the (logarithm of) the density evaluation.
 #' set.seed(100)
 #' q <- 5
@@ -36,20 +37,17 @@ dmatn <- function(X, M, Q, P, logd = FALSE) {
 #' S <- crossprod(matrix(rnorm(q*q), q, q))
 #' Sigma <- rinvwish(v, S)
 #' dinvwish(Sigma, v, S, logd = TRUE)
-rinvwish <- function(v, S) {
-    .Call(`_fdr_rinvwish`, v, S)
-}
-
-#' @rdname rinvwish
-#' @param Sigma \code{q * q} matrix at which to evaluate the density
-#' @param logd logical; if \code{TRUE} the logarithm of the density is returned
-dinvwish <- function(Sigma, v, S, logd = FALSE) {
-    .Call(`_fdr_dinvwish`, Sigma, v, S, logd)
-}
+#' @references Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.
+#' In G. Elliott & T. Timmermann (Eds.), Handbook of economic forecasting,
+#' volume 2B. North Holland, Elsevier.
+NULL
 
 #' Generate from and evaluate the density of the multivariate normal distribution
+#' @param x \code{n * p} matrix at which to evaluate the density
 #' @param m mean vector (length \code{p})
 #' @param Sigma \code{p * p} covariance matrix
+#' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+#' @name multn
 #' @return For \code{rmultn} a vector \code{x}, for \code{dmultn} the (logarithm of) the density evaluation.
 #' set.seed(100)
 #' p <- 20
@@ -57,14 +55,72 @@ dinvwish <- function(Sigma, v, S, logd = FALSE) {
 #' Sigma <- crossprod(matrix(rnorm(p*p), p, p))
 #' x <- rmultn(m, Sigma)
 #' dmultn(x, m, Sigma, logd = TRUE)
+#' @references Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.
+#' In G. Elliott & T. Timmermann (Eds.), Handbook of economic forecasting,
+#' volume 2B. North Holland, Elsevier.
+NULL
+
+#' Generate from and evaluate the density of the matrix t distribution
+#' @param X \code{p * q} matrix at which to evaluate the density
+#' @param M \code{p * q} mean matrix
+#' @param Q \code{q * q} covariance matrix
+#' @param P \code{p * p} covariance matrix
+#' @param v degrees of freedom (single-element numeric vector)
+#' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+#' @name matt
+#' @return For \code{rmatt} a matrix \code{X}, for \code{dmatt} the (logarithm of) the density evaluation.
+#' @examples
+#' set.seed(100)
+#' p <- 20
+#' q <- 5
+#' M <- matrix(rnorm(p*q), p, q)
+#' P <- crossprod(matrix(rnorm(p*p), p, p))
+#' Q <- crossprod(matrix(rnorm(q*q), q, q))
+#' v <- 10
+#' X <- rmatt(M, Q, P, v)
+#' dmatt(X, M, Q, P, v, logd = TRUE)
+#' @references Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.
+#' In G. Elliott & T. Timmermann (Eds.), Handbook of economic forecasting,
+#' volume 2B. North Holland, Elsevier.
+NULL
+
+#' @rdname matn
+rmatn <- function(M, Q, P) {
+    .Call(`_fdr_rmatn`, M, Q, P)
+}
+
+#' @rdname matn
+dmatn <- function(X, M, Q, P, logd = FALSE) {
+    .Call(`_fdr_dmatn`, X, M, Q, P, logd)
+}
+
+#' @rdname invwish
+rinvwish <- function(v, S) {
+    .Call(`_fdr_rinvwish`, v, S)
+}
+
+#' @rdname invwish
+dinvwish <- function(Sigma, v, S, logd = FALSE) {
+    .Call(`_fdr_dinvwish`, Sigma, v, S, logd)
+}
+
+#' @rdname multn
 rmultn <- function(m, Sigma) {
     .Call(`_fdr_rmultn`, m, Sigma)
 }
 
-#' @rdname rmultn
-#' @param x \code{n * p} matrix at which to evaluate the density
-#' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+#' @rdname multn
 dmultn <- function(x, m, Sigma, logd = FALSE) {
     .Call(`_fdr_dmultn`, x, m, Sigma, logd)
+}
+
+#' @rdname matt
+rmatt <- function(M, Q, P, v) {
+    .Call(`_fdr_rmatt`, M, Q, P, v)
+}
+
+#' @rdname matt
+dmatt <- function(X, M, Q, P, v, logd = FALSE) {
+    .Call(`_fdr_dmatt`, X, M, Q, P, v, logd)
 }
 

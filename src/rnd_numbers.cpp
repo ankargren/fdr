@@ -2,10 +2,14 @@
 
 #include <RcppArmadillo.h>
 
+
 //' Generate from and evaluate the density of the matrix normal distribution
+//' @param X \code{p * q} matrix at which to evaluate the density
 //' @param M \code{p * q} mean matrix
 //' @param Q \code{q * q} covariance matrix
 //' @param P \code{p * p} covariance matrix
+//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+//' @name matn
 //' @return For \code{rmatn} a matrix \code{X}, for \code{dmatn} the (logarithm of) the density evaluation.
 //' @examples
 //' set.seed(100)
@@ -16,6 +20,12 @@
 //' Q <- crossprod(matrix(rnorm(q*q), q, q))
 //' X <- rmatn(M, Q, P)
 //' dmatn(X, M, Q, P, logd = TRUE)
+//' @references Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.
+//' In G. Elliott & T. Timmermann (Eds.), Handbook of economic forecasting,
+//' volume 2B. North Holland, Elsevier.
+//'
+
+//' @rdname matn
 // [[Rcpp::export]]
 arma::mat rmatn(arma::mat M, arma::mat Q, arma::mat P){
   int p = P.n_rows;
@@ -27,9 +37,7 @@ arma::mat rmatn(arma::mat M, arma::mat Q, arma::mat P){
   return(X);
 }
 
-//' @rdname rmatn
-//' @param X \code{p * q} matrix at which to evaluate the density
-//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+//' @rdname matn
 // [[Rcpp::export]]
 double dmatn(arma::mat X, arma::mat M, arma::mat Q, arma::mat P,
              bool logd = false){
@@ -53,8 +61,11 @@ double dmatn(arma::mat X, arma::mat M, arma::mat Q, arma::mat P,
 
 
 //' Generate from and evaluate the density of the inverse Wishart distribution
+//' @param Sigma \code{q * q} matrix at which to evaluate the density
 //' @param v degrees of freedom (integer)
 //' @param S \code{q * q} scale matrix
+//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+//' @name invwish
 //' @return For \code{rinvwish} a matrix \code{Sigma}, for \code{dinvwish} the (logarithm of) the density evaluation.
 //' set.seed(100)
 //' q <- 5
@@ -62,6 +73,11 @@ double dmatn(arma::mat X, arma::mat M, arma::mat Q, arma::mat P,
 //' S <- crossprod(matrix(rnorm(q*q), q, q))
 //' Sigma <- rinvwish(v, S)
 //' dinvwish(Sigma, v, S, logd = TRUE)
+//' @references Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.
+//' In G. Elliott & T. Timmermann (Eds.), Handbook of economic forecasting,
+//' volume 2B. North Holland, Elsevier.
+
+//' @rdname invwish
 // [[Rcpp::export]]
 arma::mat rinvwish(int v, arma::mat S){
   int p = S.n_rows;
@@ -82,9 +98,7 @@ arma::mat rinvwish(int v, arma::mat S){
   return(X);
 }
 
-//' @rdname rinvwish
-//' @param Sigma \code{q * q} matrix at which to evaluate the density
-//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+//' @rdname invwish
 // [[Rcpp::export]]
 double dinvwish(arma::mat Sigma, int v, arma::mat S, bool logd = false){
   int q = Sigma.n_cols;
@@ -110,8 +124,11 @@ double dinvwish(arma::mat Sigma, int v, arma::mat S, bool logd = false){
 }
 
 //' Generate from and evaluate the density of the multivariate normal distribution
+//' @param x \code{n * p} matrix at which to evaluate the density
 //' @param m mean vector (length \code{p})
 //' @param Sigma \code{p * p} covariance matrix
+//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+//' @name multn
 //' @return For \code{rmultn} a vector \code{x}, for \code{dmultn} the (logarithm of) the density evaluation.
 //' set.seed(100)
 //' p <- 20
@@ -119,11 +136,13 @@ double dinvwish(arma::mat Sigma, int v, arma::mat S, bool logd = false){
 //' Sigma <- crossprod(matrix(rnorm(p*p), p, p))
 //' x <- rmultn(m, Sigma)
 //' dmultn(x, m, Sigma, logd = TRUE)
+//' @references Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.
+//' In G. Elliott & T. Timmermann (Eds.), Handbook of economic forecasting,
+//' volume 2B. North Holland, Elsevier.
+
+//' @rdname multn
 // [[Rcpp::export]]
 arma::vec rmultn(arma::vec m, arma::mat Sigma){
-  /*-------------------------------------------------------
-# Generate draws from a matricvariate normal distribution
-#-------------------------------------------------------*/
   int p = Sigma.n_rows;
   arma::vec X = Rcpp::rnorm(p);
   arma::mat L = arma::chol(Sigma, "lower");
@@ -133,9 +152,7 @@ arma::vec rmultn(arma::vec m, arma::mat Sigma){
 
 const double log2pi = std::log(2.0 * M_PI);
 
-//' @rdname rmultn
-//' @param x \code{n * p} matrix at which to evaluate the density
-//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+//' @rdname multn
 // [[Rcpp::export]]
 arma::vec dmultn(arma::mat x,
                       arma::rowvec m,
@@ -159,7 +176,66 @@ arma::vec dmultn(arma::mat x,
   return(out);
 }
 
+//' Generate from and evaluate the density of the matrix t distribution
+//' @param X \code{p * q} matrix at which to evaluate the density
+//' @param M \code{p * q} mean matrix
+//' @param Q \code{q * q} covariance matrix
+//' @param P \code{p * p} covariance matrix
+//' @param v degrees of freedom (single-element numeric vector)
+//' @param logd logical; if \code{TRUE} the logarithm of the density is returned
+//' @name matt
+//' @return For \code{rmatt} a matrix \code{X}, for \code{dmatt} the (logarithm of) the density evaluation.
+//' @examples
+//' set.seed(100)
+//' p <- 20
+//' q <- 5
+//' M <- matrix(rnorm(p*q), p, q)
+//' P <- crossprod(matrix(rnorm(p*p), p, p))
+//' Q <- crossprod(matrix(rnorm(q*q), q, q))
+//' v <- 10
+//' X <- rmatt(M, Q, P, v)
+//' dmatt(X, M, Q, P, v, logd = TRUE)
+//' @references Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.
+//' In G. Elliott & T. Timmermann (Eds.), Handbook of economic forecasting,
+//' volume 2B. North Holland, Elsevier.
 
+//' @rdname matt
+// [[Rcpp::export]]
+arma::mat rmatt(arma::mat M, arma::mat Q, arma::mat P, double v) {
+  arma::mat P_inv = arma::inv_sympd(P);
+  arma::mat Sigma = rinvwish(v, Q);
+  arma::mat X = rmatn(M, Sigma, P_inv);
+  return(X);
+}
+
+//' @rdname matt
+// [[Rcpp::export]]
+double dmatt(arma::mat X, arma::mat M, arma::mat Q, arma::mat P, double v, bool logd = false) {
+  int q = Q.n_rows;
+  int p = P.n_rows;
+  double Q_logdet;
+  double P_logdet;
+  double kern_logdet;
+  double Q_sign;
+  double P_sign;
+  double kern_sign;
+  arma::log_det(Q_logdet, Q_sign, Q);
+  arma::log_det(P_logdet, P_sign, P);
+  arma::mat ss = X - M;
+  arma::log_det(kern_logdet, kern_sign, Q + ss.t() * P * ss);
+
+  double k = p * q * (log(M_PI) * 0.5) - 0.5 * P_logdet * q - 0.5 * Q_logdet * v;
+  double lgam = 0;
+  for (int i = 1; i <= q; i++) {
+    lgam = lgam + lgamma((v+1-i)*0.5) - lgamma((v+p+1-i)/2);
+  }
+  k = k + lgam;
+  double out = -k - 0.5 * kern_logdet * (v+p);
+  if (logd == false) {
+    out = exp(out);
+  }
+  return(out);
+}
 
 double dmatn2(arma::mat X, arma::mat M, arma::mat Q, arma::mat P,
               bool logd = false){

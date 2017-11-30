@@ -86,6 +86,36 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rmatt
+arma::mat rmatt(arma::mat M, arma::mat Q, arma::mat P, double v);
+RcppExport SEXP _fdr_rmatt(SEXP MSEXP, SEXP QSEXP, SEXP PSEXP, SEXP vSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Q(QSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type P(PSEXP);
+    Rcpp::traits::input_parameter< double >::type v(vSEXP);
+    rcpp_result_gen = Rcpp::wrap(rmatt(M, Q, P, v));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dmatt
+double dmatt(arma::mat X, arma::mat M, arma::mat Q, arma::mat P, double v, bool logd);
+RcppExport SEXP _fdr_dmatt(SEXP XSEXP, SEXP MSEXP, SEXP QSEXP, SEXP PSEXP, SEXP vSEXP, SEXP logdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Q(QSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type P(PSEXP);
+    Rcpp::traits::input_parameter< double >::type v(vSEXP);
+    Rcpp::traits::input_parameter< bool >::type logd(logdSEXP);
+    rcpp_result_gen = Rcpp::wrap(dmatt(X, M, Q, P, v, logd));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_fdr_rmatn", (DL_FUNC) &_fdr_rmatn, 3},
@@ -94,6 +124,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fdr_dinvwish", (DL_FUNC) &_fdr_dinvwish, 4},
     {"_fdr_rmultn", (DL_FUNC) &_fdr_rmultn, 2},
     {"_fdr_dmultn", (DL_FUNC) &_fdr_dmultn, 4},
+    {"_fdr_rmatt", (DL_FUNC) &_fdr_rmatt, 4},
+    {"_fdr_dmatt", (DL_FUNC) &_fdr_dmatt, 6},
     {NULL, NULL, 0}
 };
 
