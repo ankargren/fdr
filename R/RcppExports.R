@@ -31,6 +31,7 @@ NULL
 #' @param logd logical; if \code{TRUE} the logarithm of the density is returned
 #' @name invwish
 #' @return For \code{rinvwish} a matrix \code{Sigma}, for \code{dinvwish} the (logarithm of) the density evaluation.
+#' @examples
 #' set.seed(100)
 #' q <- 5
 #' v <- 10
@@ -49,6 +50,7 @@ NULL
 #' @param logd logical; if \code{TRUE} the logarithm of the density is returned
 #' @name multn
 #' @return For \code{rmultn} a vector \code{x}, for \code{dmultn} the (logarithm of) the density evaluation.
+#' @examples
 #' set.seed(100)
 #' p <- 20
 #' m <- rnorm(p)
@@ -102,6 +104,10 @@ rinvwish <- function(v, S) {
 #' @rdname invwish
 dinvwish <- function(Sigma, v, S, logd = FALSE) {
     .Call(`_fdr_dinvwish`, Sigma, v, S, logd)
+}
+
+dinvwish2 <- function(Sigma, v, S, logd = FALSE) {
+    .Call(`_fdr_dinvwish2`, Sigma, v, S, logd)
 }
 
 #' @rdname multn

@@ -67,6 +67,7 @@ double dmatn(arma::mat X, arma::mat M, arma::mat Q, arma::mat P,
 //' @param logd logical; if \code{TRUE} the logarithm of the density is returned
 //' @name invwish
 //' @return For \code{rinvwish} a matrix \code{Sigma}, for \code{dinvwish} the (logarithm of) the density evaluation.
+//' @examples
 //' set.seed(100)
 //' q <- 5
 //' v <- 10
@@ -123,6 +124,31 @@ double dinvwish(arma::mat Sigma, int v, arma::mat S, bool logd = false){
   return(out);
 }
 
+// [[Rcpp::export]]
+double dinvwish2(arma::mat Sigma, int v, arma::mat S, bool logd = false){
+  int q = Sigma.n_cols;
+  double k = 0.5*v*q*log(2) + 0.25*q*(q-1)*log(M_PI);
+  double lgam = 0;
+  for (int i = 1; i <= q; i++) {
+    lgam = lgam + lgamma((v+1-i)*0.5);
+  }
+  k = k + lgam;
+  arma::mat Sigma_C = arma::chol(Sigma);
+  arma::mat Sigma_C_inv = arma::inv(arma::trimatu(Sigma_C));
+  double Sigma_logdet = sum(log(arma::diagvec(Sigma_C)));
+
+  arma::mat S_C = arma::chol(S);
+  arma::mat S_C_inv = arma::inv(arma::trimatu(S_C));
+  double S_logdet = sum(log(arma::diagvec(S_C)));
+
+  double kern = v*S_logdet -(v+q+1)*Sigma_logdet-0.5*arma::trace(Sigma_C_inv * Sigma_C_inv.t() * S);
+  double out = -k + kern;
+  if (logd == false) {
+    out = exp(out);
+  }
+  return(out);
+}
+
 //' Generate from and evaluate the density of the multivariate normal distribution
 //' @param x \code{n * p} matrix at which to evaluate the density
 //' @param m mean vector (length \code{p})
@@ -130,6 +156,7 @@ double dinvwish(arma::mat Sigma, int v, arma::mat S, bool logd = false){
 //' @param logd logical; if \code{TRUE} the logarithm of the density is returned
 //' @name multn
 //' @return For \code{rmultn} a vector \code{x}, for \code{dmultn} the (logarithm of) the density evaluation.
+//' @examples
 //' set.seed(100)
 //' p <- 20
 //' m <- rnorm(p)

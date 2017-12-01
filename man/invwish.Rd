@@ -21,15 +21,17 @@ dinvwish(Sigma, v, S, logd = FALSE)
 }
 \value{
 For \code{rinvwish} a matrix \code{Sigma}, for \code{dinvwish} the (logarithm of) the density evaluation.
+}
+\description{
+Generate from and evaluate the density of the inverse Wishart distribution
+}
+\examples{
 set.seed(100)
 q <- 5
 v <- 10
 S <- crossprod(matrix(rnorm(q*q), q, q))
 Sigma <- rinvwish(v, S)
 dinvwish(Sigma, v, S, logd = TRUE)
-}
-\description{
-Generate from and evaluate the density of the inverse Wishart distribution
 }
 \references{
 Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.

@@ -21,15 +21,17 @@ dmultn(x, m, Sigma, logd = FALSE)
 }
 \value{
 For \code{rmultn} a vector \code{x}, for \code{dmultn} the (logarithm of) the density evaluation.
+}
+\description{
+Generate from and evaluate the density of the multivariate normal distribution
+}
+\examples{
 set.seed(100)
 p <- 20
 m <- rnorm(p)
 Sigma <- crossprod(matrix(rnorm(p*p), p, p))
 x <- rmultn(m, Sigma)
 dmultn(x, m, Sigma, logd = TRUE)
-}
-\description{
-Generate from and evaluate the density of the multivariate normal distribution
 }
 \references{
 Karlsson, S. (2013). Forecasting with Bayesian vector autoregressions.

@@ -1,7 +1,7 @@
 fdr
 ======
 
-[![Build Status](https://travis-ci.org/ankargren/fdr.svg?branch=master)](https://travis-ci.org/ankargren/fdr) [![](http://www.r-pkg.org/badges/version/fdr)](http://www.r-pkg.org/pkg/fdr) [![Coverage status](https://codecov.io/gh/ankargren/fdr/master/graph/badge.svg)](https://codecov.io/github/ankargren/fdr?branch=master)
+[![Build Status](https://travis-ci.org/ankargren/fdr.svg?branch=master)](https://travis-ci.org/ankargren/fdr) [![](http://www.r-pkg.org/badges/version/fdr)](http://www.r-pkg.org/pkg/fdr) [![Coverage status](https://codecov.io/gh/ankargren/fdr/branch/master/graph/badge.svg)](https://codecov.io/github/ankargren/fdr)
 
 Overview
 --------

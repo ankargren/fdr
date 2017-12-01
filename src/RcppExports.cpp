@@ -60,6 +60,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dinvwish2
+double dinvwish2(arma::mat Sigma, int v, arma::mat S, bool logd);
+RcppExport SEXP _fdr_dinvwish2(SEXP SigmaSEXP, SEXP vSEXP, SEXP SSEXP, SEXP logdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< int >::type v(vSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type S(SSEXP);
+    Rcpp::traits::input_parameter< bool >::type logd(logdSEXP);
+    rcpp_result_gen = Rcpp::wrap(dinvwish2(Sigma, v, S, logd));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rmultn
 arma::vec rmultn(arma::vec m, arma::mat Sigma);
 RcppExport SEXP _fdr_rmultn(SEXP mSEXP, SEXP SigmaSEXP) {
@@ -122,6 +136,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fdr_dmatn", (DL_FUNC) &_fdr_dmatn, 5},
     {"_fdr_rinvwish", (DL_FUNC) &_fdr_rinvwish, 2},
     {"_fdr_dinvwish", (DL_FUNC) &_fdr_dinvwish, 4},
+    {"_fdr_dinvwish2", (DL_FUNC) &_fdr_dinvwish2, 4},
     {"_fdr_rmultn", (DL_FUNC) &_fdr_rmultn, 2},
     {"_fdr_dmultn", (DL_FUNC) &_fdr_dmultn, 4},
     {"_fdr_rmatt", (DL_FUNC) &_fdr_rmatt, 4},
